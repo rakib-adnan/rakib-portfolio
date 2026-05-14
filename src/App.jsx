@@ -39,13 +39,13 @@ const PageLoader = () => (
   </div>
 )
 
-// Page transition wrapper
+// Page transition wrapper — fade only, no y-offset (y-offset fights scroll)
 const PageTransition = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    transition={{ duration: 0.35, ease: 'easeOut' }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.25, ease: 'easeOut' }}
   >
     {children}
   </motion.div>
@@ -56,7 +56,7 @@ const PublicLayout = () => {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-dark-900 relative">
+    <div className="min-h-screen relative" style={{ backgroundColor: '#030712' }}>
       <CanvasBg />
       <Navbar />
       <Suspense fallback={<PageLoader />}>

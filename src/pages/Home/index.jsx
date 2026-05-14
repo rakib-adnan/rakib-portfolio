@@ -250,12 +250,12 @@ const socialLinks = [
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 const SkillBar = ({ label, percent, icon: Icon, color, delay }) => {
-  const [ref, inView] = useInView({ threshold: 0.5, triggerOnce: true })
+  const [ref, inView] = useInView({ threshold: 0, triggerOnce: true })
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, x: -30 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay }}
       className="mb-5"
     >

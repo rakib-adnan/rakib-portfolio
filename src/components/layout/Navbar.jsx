@@ -96,12 +96,27 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <button onClick={() => handleNavClick('#home')} className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-shadow flex-shrink-0">
-              <span className="text-white font-black text-sm tracking-tight">RA</span>
+            <div className="relative w-10 h-10 flex-shrink-0">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 opacity-20 blur-sm group-hover:opacity-40 transition-opacity" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/40 group-hover:shadow-cyan-500/70 transition-shadow border border-cyan-400/20">
+                <span className="text-white font-black text-sm tracking-tight" style={{ textShadow: '0 0 8px rgba(255,255,255,0.6)' }}>RA</span>
+              </div>
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors">Rakib Adnan</span>
-              <span className="text-xs text-cyan-400/70 font-medium tracking-widest uppercase">Web Developer</span>
+            <div className="flex flex-col leading-none gap-0.5">
+              <span
+                className="text-base font-black tracking-wide"
+                style={{
+                  background: 'linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textShadow: 'none',
+                  filter: 'drop-shadow(0 0 6px rgba(6,182,212,0.5))',
+                }}
+              >
+                Rakib Adnan
+              </span>
+              <span className="text-[10px] text-cyan-400/60 font-mono tracking-[0.2em] uppercase">&lt;Web Dev /&gt;</span>
             </div>
           </button>
 
