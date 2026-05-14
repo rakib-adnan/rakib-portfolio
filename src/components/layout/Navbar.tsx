@@ -5,16 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiMenu, HiX } from 'react-icons/hi'
 
 const navLinks = [
-  { name: 'Home', href: '#home' },
-  { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Home',     href: '/' },
+  { name: 'About',    href: '/about' },
+  { name: 'Projects', href: '/projects' },
+  { name: 'Reviews',  href: '/reviews' },
+  { name: 'Blog',     href: '/blog' },
+  { name: 'Contact',  href: '/contact' },
 ]
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('home')
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -29,56 +30,13 @@ const Navbar = () => {
     setMobileOpen(false)
   }, [location.pathname])
 
-  // Track active section via IntersectionObserver (only on home page)
-  useEffect(() => {
-    if (location.pathname !== '/') return
-
-    const sectionIds = ['home', 'about', 'projects', 'contact']
-    const observers = []
-
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id)
-      if (!el) return
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveSection(id)
-          }
-        },
-        { threshold: 0.3, rootMargin: '-80px 0px -60% 0px' }
-      )
-      observer.observe(el)
-      observers.push(observer)
-    })
-
-    return () => observers.forEach((o) => o.disconnect())
-  }, [location.pathname])
-
   const handleNavClick = (href) => {
-    if (href.startsWith('#')) {
-      if (location.pathname !== '/') {
-        // Navigate to home first, then scroll after a brief delay
-        navigate('/')
-        setTimeout(() => {
-          const el = document.querySelector(href)
-          if (el) el.scrollIntoView({ behavior: 'smooth' })
-        }, 300)
-      } else {
-        const el = document.querySelector(href)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      }
-      setMobileOpen(false)
-    } else {
-      navigate(href)
-      setMobileOpen(false)
-    }
+    navigate(href)
+    setMobileOpen(false)
   }
 
   const isLinkActive = (link) => {
-    if (link.href.startsWith('#')) {
-      return location.pathname === '/' && activeSection === link.href.slice(1)
-    }
+    if (link.href === '/') return location.pathname === '/'
     return location.pathname.startsWith(link.href)
   }
 
