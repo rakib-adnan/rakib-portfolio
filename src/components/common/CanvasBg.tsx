@@ -18,7 +18,7 @@ const CanvasBg = () => {
     const ROWS = 34
     const HORIZON = 0.40   // horizon position as fraction of screen height
     const WAVE_AMP = 24    // max wave amplitude (pixels, at near)
-    const WAVE_SPEED = 5.0 // matches original uniforms.speed = 5
+    const WAVE_SPEED = 1.8 // slow, gentle wave
 
     const onResize = () => {
       canvas.width = window.innerWidth
