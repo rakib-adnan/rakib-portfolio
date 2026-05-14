@@ -12,8 +12,9 @@ import {
   HiLogout,
   HiCode,
   HiChevronRight,
+  HiDocumentText,
+  HiCog,
 } from 'react-icons/hi'
-import { FaCode } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -23,6 +24,9 @@ const sidebarLinks = [
   { to: '/dashboard/reviews', label: 'Reviews', icon: HiStar },
   { to: '/dashboard/messages', label: 'Messages', icon: HiMail },
   { to: '/dashboard/hero', label: 'Hero Content', icon: HiPhotograph },
+  { to: '/dashboard/blog', label: 'Blog Posts', icon: HiDocumentText },
+  { to: '/dashboard/gallery', label: 'Gallery', icon: HiPhotograph },
+  { to: '/dashboard/settings', label: 'Settings', icon: HiCog },
 ]
 
 // Protected Route wrapper
@@ -78,7 +82,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between px-4 h-16 border-b border-cyan-500/10">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                <FaCode className="text-white text-sm" />
+                <span className="text-white font-black text-xs">RA</span>
               </div>
               <span className="text-white font-semibold text-sm">Admin Panel</span>
             </div>
@@ -205,7 +209,7 @@ export const DashboardOverview = () => {
 
       <div className="glass-card p-6">
         <h2 className="text-white font-semibold mb-3">Quick Links</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {sidebarLinks.slice(1).map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}

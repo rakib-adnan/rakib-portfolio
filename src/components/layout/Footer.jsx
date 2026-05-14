@@ -3,66 +3,87 @@ import { motion } from 'framer-motion'
 import {
   FaGithub,
   FaLinkedin,
-  FaTwitter,
-  FaFacebook,
+  FaWhatsapp,
   FaEnvelope,
-  FaCode,
+  FaMapMarkerAlt,
+  FaPhone,
 } from 'react-icons/fa'
 import { HiArrowUp } from 'react-icons/hi'
 
-const socialLinks = [
-  { icon: FaGithub, href: 'https://github.com/', label: 'GitHub' },
-  { icon: FaLinkedin, href: 'https://linkedin.com/', label: 'LinkedIn' },
-  { icon: FaTwitter, href: 'https://twitter.com/', label: 'Twitter' },
-  { icon: FaFacebook, href: 'https://facebook.com/', label: 'Facebook' },
-  { icon: FaEnvelope, href: 'mailto:support@agencyhandy.com', label: 'Email' },
-]
-
-const footerLinks = [
+const quickLinks = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
   { label: 'Projects', to: '/projects' },
   { label: 'Reviews', to: '/reviews' },
+  { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
+]
+
+const services = [
+  'WordPress Development',
+  'Shopify Development',
+  'React JS Development',
+  'React Native',
+  'Crocoblock',
+  'Brick Builder',
+]
+
+const socialLinks = [
+  { icon: FaGithub, href: 'https://github.com/rakibadnan', label: 'GitHub' },
+  { icon: FaLinkedin, href: 'https://linkedin.com/in/rakibadnan', label: 'LinkedIn' },
+  { icon: FaWhatsapp, href: 'https://wa.me/8801601566785', label: 'WhatsApp' },
+  { icon: FaEnvelope, href: 'mailto:rakibadnan796@gmail.com', label: 'Email' },
 ]
 
 const Footer = () => {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   return (
-    <footer className="relative border-t border-cyan-500/10 bg-dark-800/50">
-      {/* Glow line */}
+    <footer className="relative border-t border-cyan-500/10" style={{ background: 'rgba(3,7,18,0.98)' }}>
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(6,182,212,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+      {/* Glow line top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Brand */}
-          <div>
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                <FaCode className="text-white text-sm" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+          {/* Brand / Bio */}
+          <div className="lg:col-span-1">
+            <Link to="/" className="flex items-center gap-3 group mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-shadow flex-shrink-0">
+                <span className="text-white font-black text-sm tracking-tight">RA</span>
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-base font-bold text-white">Rakib</span>
-                <span className="text-xs text-cyan-400 font-medium tracking-widest uppercase">Adnan</span>
+                <span className="text-base font-bold text-white">Rakib Adnan</span>
+                <span className="text-xs text-cyan-400/70 font-medium tracking-widest uppercase">Web Developer</span>
               </div>
             </Link>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-              Professional Web Developer specializing in WordPress, Shopify, and React. Crafting digital experiences since 2020.
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Professional web developer specializing in WordPress, Shopify, React JS &amp; React Native. Crafting fast, beautiful digital experiences since 2020.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Quick Links</h4>
-            <ul className="space-y-2">
-              {footerLinks.map((link) => (
+            <h4 className="text-white font-semibold mb-5 text-sm tracking-wider uppercase flex items-center gap-2">
+              <span className="w-4 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 inline-block rounded" />
+              Quick Links
+            </h4>
+            <ul className="space-y-2.5">
+              {quickLinks.map((link) => (
                 <li key={link.to}>
                   <Link
                     to={link.to}
                     className="text-slate-400 hover:text-cyan-400 transition-colors text-sm flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-cyan-500/50 group-hover:bg-cyan-400 transition-colors" />
+                    <span className="w-1 h-1 rounded-full bg-cyan-500/40 group-hover:bg-cyan-400 transition-colors flex-shrink-0" />
                     {link.label}
                   </Link>
                 </li>
@@ -70,16 +91,61 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Services */}
+          <div>
+            <h4 className="text-white font-semibold mb-5 text-sm tracking-wider uppercase flex items-center gap-2">
+              <span className="w-4 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 inline-block rounded" />
+              Services
+            </h4>
+            <ul className="space-y-2.5">
+              {services.map((service) => (
+                <li key={service}>
+                  <span className="text-slate-400 text-sm flex items-center gap-2 group">
+                    <span className="w-1 h-1 rounded-full bg-blue-500/40 flex-shrink-0" />
+                    {service}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Get In Touch</h4>
-            <a
-              href="mailto:support@agencyhandy.com"
-              className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors block mb-4"
-            >
-              support@agencyhandy.com
-            </a>
-            <div className="flex items-center gap-3">
+            <h4 className="text-white font-semibold mb-5 text-sm tracking-wider uppercase flex items-center gap-2">
+              <span className="w-4 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 inline-block rounded" />
+              Contact
+            </h4>
+            <ul className="space-y-3 mb-5">
+              <li>
+                <a
+                  href="mailto:rakibadnan796@gmail.com"
+                  className="flex items-start gap-3 text-slate-400 hover:text-cyan-400 transition-colors text-sm group"
+                >
+                  <FaEnvelope size={14} className="mt-0.5 flex-shrink-0 text-cyan-500/60 group-hover:text-cyan-400 transition-colors" />
+                  rakibadnan796@gmail.com
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://wa.me/8801601566785"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 text-slate-400 hover:text-cyan-400 transition-colors text-sm group"
+                >
+                  <FaWhatsapp size={14} className="mt-0.5 flex-shrink-0 text-cyan-500/60 group-hover:text-cyan-400 transition-colors" />
+                  +8801601566785
+                </a>
+              </li>
+              <li>
+                <span className="flex items-start gap-3 text-slate-400 text-sm">
+                  <FaMapMarkerAlt size={14} className="mt-0.5 flex-shrink-0 text-cyan-500/60" />
+                  Bangladesh
+                </span>
+              </li>
+            </ul>
+
+            {/* Social links */}
+            <div className="flex items-center gap-2.5">
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}
@@ -88,7 +154,7 @@ const Footer = () => {
                   rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={label}
                   whileHover={{ y: -3 }}
-                  className="w-9 h-9 rounded-lg bg-dark-700/80 border border-cyan-500/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all duration-300"
+                  className="w-9 h-9 rounded-lg bg-dark-800/80 border border-cyan-500/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all duration-300"
                 >
                   <Icon size={15} />
                 </motion.a>
@@ -98,9 +164,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-cyan-500/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-6 border-t border-cyan-500/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} Rakib Adnan. All rights reserved.
+            &copy; 2024 Rakib Adnan. All rights reserved.
           </p>
           <button
             onClick={scrollToTop}

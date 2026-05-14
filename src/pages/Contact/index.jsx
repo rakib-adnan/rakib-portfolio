@@ -7,9 +7,9 @@ import {
   FaMapMarkerAlt,
   FaGithub,
   FaLinkedin,
-  FaTwitter,
-  FaFacebook,
+  FaWhatsapp,
   FaPaperPlane,
+  FaPhone,
 } from 'react-icons/fa'
 import { HiCheckCircle } from 'react-icons/hi'
 import { useSendMessageMutation } from '../../services/portfolioApi'
@@ -20,8 +20,14 @@ const contactInfo = [
   {
     icon: FaEnvelope,
     label: 'Email',
-    value: 'support@agencyhandy.com',
-    href: 'mailto:support@agencyhandy.com',
+    value: 'rakibadnan796@gmail.com',
+    href: 'mailto:rakibadnan796@gmail.com',
+  },
+  {
+    icon: FaPhone,
+    label: 'Phone / WhatsApp',
+    value: '+8801601566785',
+    href: 'https://wa.me/8801601566785',
   },
   {
     icon: FaMapMarkerAlt,
@@ -32,10 +38,10 @@ const contactInfo = [
 ]
 
 const socialLinks = [
-  { icon: FaGithub, href: 'https://github.com/', label: 'GitHub' },
-  { icon: FaLinkedin, href: 'https://linkedin.com/', label: 'LinkedIn' },
-  { icon: FaTwitter, href: 'https://twitter.com/', label: 'Twitter' },
-  { icon: FaFacebook, href: 'https://facebook.com/', label: 'Facebook' },
+  { icon: FaGithub, href: 'https://github.com/rakibadnan', label: 'GitHub' },
+  { icon: FaLinkedin, href: 'https://linkedin.com/in/rakibadnan', label: 'LinkedIn' },
+  { icon: FaWhatsapp, href: 'https://wa.me/8801601566785', label: 'WhatsApp' },
+  { icon: FaEnvelope, href: 'mailto:rakibadnan796@gmail.com', label: 'Email' },
 ]
 
 const Contact = () => {
@@ -51,7 +57,7 @@ const Contact = () => {
   const onSubmit = async (data) => {
     try {
       await sendMessage(data).unwrap()
-      toast.success('Message sent! I\'ll get back to you soon.', {
+      toast.success("Message sent! I'll get back to you soon.", {
         duration: 5000,
         icon: '✅',
         style: {
@@ -61,9 +67,9 @@ const Contact = () => {
         },
       })
       reset()
-    } catch (error) {
+    } catch {
       // Even if Firebase isn't configured, show success for demo
-      toast.success('Message sent! I\'ll get back to you soon.', {
+      toast.success("Message sent! I'll get back to you soon.", {
         duration: 5000,
         icon: '✅',
         style: {
@@ -80,7 +86,12 @@ const Contact = () => {
     <>
       <Helmet>
         <title>Contact | Rakib Adnan - Web Developer</title>
-        <meta name="description" content="Get in touch with Rakib Adnan for web development projects. Available for WordPress, Shopify, React, and custom web development." />
+        <meta
+          name="description"
+          content="Get in touch with Rakib Adnan for web development projects. Available for WordPress, Shopify, React, and custom web development."
+        />
+        <meta property="og:title" content="Contact | Rakib Adnan - Web Developer" />
+        <meta property="og:description" content="Get in touch with Rakib Adnan for web development projects." />
       </Helmet>
 
       <div className="min-h-screen relative overflow-hidden grid-bg">
@@ -115,7 +126,12 @@ const Contact = () => {
                       <div>
                         <p className="text-slate-500 text-xs uppercase tracking-widest mb-0.5">{label}</p>
                         {href ? (
-                          <a href={href} className="text-slate-200 text-sm hover:text-cyan-400 transition-colors">
+                          <a
+                            href={href}
+                            target={href.startsWith('http') ? '_blank' : undefined}
+                            rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                            className="text-slate-200 text-sm hover:text-cyan-400 transition-colors"
+                          >
                             {value}
                           </a>
                         ) : (
@@ -134,8 +150,8 @@ const Contact = () => {
                       <motion.a
                         key={label}
                         href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target={href.startsWith('http') ? '_blank' : undefined}
+                        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                         aria-label={label}
                         whileHover={{ y: -3 }}
                         className="w-10 h-10 rounded-lg bg-dark-800 border border-cyan-500/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
@@ -145,6 +161,20 @@ const Contact = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* WhatsApp CTA */}
+                <a
+                  href="https://wa.me/8801601566785"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/20 hover:border-green-500/40 transition-all group"
+                >
+                  <FaWhatsapp size={22} className="text-green-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-white text-sm font-medium group-hover:text-green-400 transition-colors">Chat on WhatsApp</p>
+                    <p className="text-slate-400 text-xs">+8801601566785 — Quick response</p>
+                  </div>
+                </a>
 
                 {/* Quick response notice */}
                 <div className="glass-card p-4">

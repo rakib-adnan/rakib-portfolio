@@ -10,6 +10,7 @@ import {
   query,
   getDoc,
   setDoc,
+  where,
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
@@ -17,7 +18,7 @@ import { db } from '../firebase/config'
 export const portfolioApi = createApi({
   reducerPath: 'portfolioApi',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero'],
+  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero', 'Blogs', 'Gallery', 'Settings'],
   endpoints: (builder) => ({
     // ─── PROJECTS ───────────────────────────────────────────────
     getProjects: builder.query({
@@ -228,6 +229,172 @@ export const portfolioApi = createApi({
       },
       invalidatesTags: ['Hero'],
     }),
+
+    // ─── BLOGS ──────────────────────────────────────────────────
+    getBlogs: builder.query({
+      async queryFn() {
+        try {
+          const q = query(collection(db, 'blogs'), orderBy('createdAt', 'desc'))
+          const snapshot = await getDocs(q)
+          const blogs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
+          return { data: blogs }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['Blogs'],
+    }),
+
+    getBlogBySlug: builder.query({
+      async queryFn(slug) {
+        try {
+          const q = query(collection(db, 'blogs'), where('slug', '==', slug))
+          const snapshot = await getDocs(q)
+          if (snapshot.empty) {
+            return { error: { message: 'Blog post not found' } }
+          }
+          const d = snapshot.docs[0]
+          return { data: { id: d.id, ...d.data() } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['Blogs'],
+    }),
+
+    addBlog: builder.mutation({
+      async queryFn(blog) {
+        try {
+          const docRef = await addDoc(collection(db, 'blogs'), {
+            ...blog,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          })
+          return { data: { id: docRef.id } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Blogs'],
+    }),
+
+    updateBlog: builder.mutation({
+      async queryFn({ id, ...blog }) {
+        try {
+          await updateDoc(doc(db, 'blogs', id), {
+            ...blog,
+            updatedAt: serverTimestamp(),
+          })
+          return { data: { id } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Blogs'],
+    }),
+
+    deleteBlog: builder.mutation({
+      async queryFn(id) {
+        try {
+          await deleteDoc(doc(db, 'blogs', id))
+          return { data: { id } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Blogs'],
+    }),
+
+    // ─── GALLERY ────────────────────────────────────────────────
+    getGallery: builder.query({
+      async queryFn() {
+        try {
+          const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'))
+          const snapshot = await getDocs(q)
+          const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
+          return { data: items }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['Gallery'],
+    }),
+
+    addGalleryItem: builder.mutation({
+      async queryFn(item) {
+        try {
+          const docRef = await addDoc(collection(db, 'gallery'), {
+            ...item,
+            createdAt: serverTimestamp(),
+          })
+          return { data: { id: docRef.id } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Gallery'],
+    }),
+
+    deleteGalleryItem: builder.mutation({
+      async queryFn(id) {
+        try {
+          await deleteDoc(doc(db, 'gallery', id))
+          return { data: { id } }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Gallery'],
+    }),
+
+    // ─── SITE SETTINGS ──────────────────────────────────────────
+    getSiteSettings: builder.query({
+      async queryFn() {
+        try {
+          const docRef = doc(db, 'settings', 'site')
+          const snapshot = await getDoc(docRef)
+          if (snapshot.exists()) {
+            return { data: { id: snapshot.id, ...snapshot.data() } }
+          }
+          return {
+            data: {
+              name: 'Rakib Adnan',
+              tagline: 'Web Developer',
+              logo: '',
+              heroTitle: 'Hi, I\'m Rakib Adnan',
+              heroSubtitle: 'Web Developer | React Specialist | WordPress Expert',
+              heroBio: 'I build high-performance websites and web applications that help businesses grow online. With 5+ years of experience and 500+ projects delivered, I turn your vision into digital reality.',
+              cvUrl: '',
+              profileImage: '',
+              services: [],
+              socialLinks: {
+                github: 'https://github.com/rakib-adnan',
+                linkedin: 'https://linkedin.com/in/rakibadnan',
+                whatsapp: '8801601566785',
+              },
+            },
+          }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['Settings'],
+    }),
+
+    updateSiteSettings: builder.mutation({
+      async queryFn(settingsData) {
+        try {
+          await setDoc(doc(db, 'settings', 'site'), {
+            ...settingsData,
+            updatedAt: serverTimestamp(),
+          }, { merge: true })
+          return { data: settingsData }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Settings'],
+    }),
   }),
 })
 
@@ -246,4 +413,14 @@ export const {
   useDeleteMessageMutation,
   useGetHeroQuery,
   useUpdateHeroMutation,
+  useGetBlogsQuery,
+  useGetBlogBySlugQuery,
+  useAddBlogMutation,
+  useUpdateBlogMutation,
+  useDeleteBlogMutation,
+  useGetGalleryQuery,
+  useAddGalleryItemMutation,
+  useDeleteGalleryItemMutation,
+  useGetSiteSettingsQuery,
+  useUpdateSiteSettingsMutation,
 } = portfolioApi

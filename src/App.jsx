@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState } from 'react'
 
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
-import ParticlesBg from './components/common/ParticlesBg'
+import CanvasBg from './components/common/CanvasBg'
+import AppLoader from './components/common/PageLoader'
 import Dashboard, { ProtectedRoute, DashboardOverview } from './pages/Dashboard/index'
 import Login from './pages/Dashboard/Login'
 
@@ -15,17 +16,25 @@ const About = lazy(() => import('./pages/About'))
 const Projects = lazy(() => import('./pages/Projects'))
 const Reviews = lazy(() => import('./pages/Reviews'))
 const Contact = lazy(() => import('./pages/Contact'))
+const Blog = lazy(() => import('./pages/Blog'))
+const BlogPost = lazy(() => import('./pages/Blog/Post'))
 const ManageProjects = lazy(() => import('./pages/Dashboard/components/ManageProjects'))
 const ManageReviews = lazy(() => import('./pages/Dashboard/components/ManageReviews'))
 const ManageContact = lazy(() => import('./pages/Dashboard/components/ManageContact'))
 const ManageHero = lazy(() => import('./pages/Dashboard/components/ManageHero'))
+const ManageBlog = lazy(() => import('./pages/Dashboard/components/ManageBlog'))
+const ManageGallery = lazy(() => import('./pages/Dashboard/components/ManageGallery'))
+const ManageSettings = lazy(() => import('./pages/Dashboard/components/ManageSettings'))
 
-// Loading fallback
+// Loading fallback (lazy suspense)
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-dark-900">
-    <div className="text-center">
-      <div className="w-10 h-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-4" />
-      <p className="text-slate-500 text-sm">Loading...</p>
+  <div className="min-h-screen flex items-center justify-center" style={{ background: '#030712' }}>
+    <div className="flex gap-2">
+      {[0,1,2].map(i => (
+        <motion.div key={i} animate={{ scale:[1,1.5,1], opacity:[0.3,1,0.3] }}
+          transition={{ duration:0.8, repeat:Infinity, delay:i*0.15 }}
+          className="w-2 h-2 rounded-full bg-cyan-400" />
+      ))}
     </div>
   </div>
 )
@@ -42,13 +51,13 @@ const PageTransition = ({ children }) => (
   </motion.div>
 )
 
-// Public layout (with Navbar + Footer + particles)
+// Public layout (with Navbar + Footer + canvas bg)
 const PublicLayout = () => {
   const location = useLocation()
 
   return (
     <div className="min-h-screen bg-dark-900 relative">
-      <ParticlesBg />
+      <CanvasBg />
       <Navbar />
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence mode="wait">
@@ -58,6 +67,8 @@ const PublicLayout = () => {
             <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
             <Route path="/reviews" element={<PageTransition><Reviews /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+            <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
+            <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
           </Routes>
         </AnimatePresence>
       </Suspense>
@@ -91,6 +102,9 @@ const AppRoutes = () => {
             <Route path="reviews" element={<ManageReviews />} />
             <Route path="messages" element={<ManageContact />} />
             <Route path="hero" element={<ManageHero />} />
+            <Route path="blog" element={<ManageBlog />} />
+            <Route path="gallery" element={<ManageGallery />} />
+            <Route path="settings" element={<ManageSettings />} />
           </Route>
         </Routes>
       </Suspense>
@@ -101,8 +115,11 @@ const AppRoutes = () => {
 }
 
 const App = () => {
+  const [loaded, setLoaded] = useState(false)
+
   return (
     <BrowserRouter>
+      {!loaded && <AppLoader onComplete={() => setLoaded(true)} />}
       <AppRoutes />
       <Toaster
         position="top-right"

@@ -85,6 +85,12 @@ const About = () => {
       <Helmet>
         <title>About | Rakib Adnan - Web Developer</title>
         <meta name="description" content="Learn about Rakib Adnan - a professional web developer with 5+ years experience in WordPress, Shopify, React JS, and more." />
+        <meta property="og:title" content="About | Rakib Adnan - Web Developer" />
+        <meta property="og:description" content="Professional web developer from Bangladesh specializing in WordPress, Shopify, React JS, and React Native. 5+ years, 500+ projects." />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="About | Rakib Adnan - Web Developer" />
+        <meta name="twitter:description" content="Professional web developer from Bangladesh specializing in WordPress, Shopify, React JS, and React Native." />
       </Helmet>
 
       <div className="min-h-screen relative overflow-hidden grid-bg">
@@ -155,7 +161,7 @@ const About = () => {
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   {[
                     { label: 'Name', value: 'Rakib Adnan' },
-                    { label: 'Email', value: 'support@agencyhandy.com' },
+                    { label: 'Email', value: 'rakibadnan796@gmail.com' },
                     { label: 'Experience', value: '5+ Years' },
                     { label: 'Projects', value: '500+ Completed' },
                   ].map(({ label, value }) => (
@@ -168,7 +174,7 @@ const About = () => {
 
                 <div className="mt-8 flex flex-wrap gap-4">
                   <a
-                    href="mailto:support@agencyhandy.com"
+                    href="mailto:rakibadnan796@gmail.com"
                     className="btn-primary"
                   >
                     Hire Me
