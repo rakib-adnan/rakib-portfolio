@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react'
 
 const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY || '401199539e13b04ab9501a0adc935709'

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate, Navigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'

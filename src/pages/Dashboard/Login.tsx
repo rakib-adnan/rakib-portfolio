@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'

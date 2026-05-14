@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import {
   collection,

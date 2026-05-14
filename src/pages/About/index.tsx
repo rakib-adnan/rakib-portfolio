@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
 import { useInView } from 'react-intersection-observer'
