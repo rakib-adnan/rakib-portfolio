@@ -27,6 +27,7 @@ const sidebarLinks = [
   { to: '/dashboard/blog',     label: 'Blog Posts',  icon: HiDocumentText,group: 'Content' },
   { to: '/dashboard/gallery',  label: 'Gallery',     icon: HiPhotograph,  group: 'Content' },
   { to: '/dashboard/messages', label: 'Messages',    icon: HiMail,        group: 'Inbox' },
+  { to: '/dashboard/about',    label: 'About Page',  icon: HiCode,        group: 'Content' },
   { to: '/dashboard/hero',     label: 'Hero Content',icon: HiPhotograph,  group: 'Appearance' },
   { to: '/dashboard/pages',    label: 'Pages',       icon: HiTemplate,    group: 'Appearance' },
   { to: '/dashboard/settings', label: 'Settings',    icon: HiCog,         group: 'Appearance' },

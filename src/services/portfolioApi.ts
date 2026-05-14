@@ -29,7 +29,7 @@ import { db } from '../firebase/config'
 export const portfolioApi = createApi({
   reducerPath: 'portfolioApi',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero', 'Blogs', 'Gallery', 'Settings', 'Pages'],
+  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero', 'Blogs', 'Gallery', 'Settings', 'Pages', 'About'],
   endpoints: (builder) => ({
     // ─── PROJECTS ───────────────────────────────────────────────
     getProjects: builder.query({
@@ -407,6 +407,50 @@ export const portfolioApi = createApi({
       invalidatesTags: ['Settings'],
     }),
 
+    // ─── ABOUT CONTENT ──────────────────────────────────────────
+    getAboutContent: builder.query({
+      async queryFn() {
+        try {
+          const snapshot = await getDoc(doc(db, 'settings', 'about'))
+          if (snapshot.exists()) return { data: snapshot.data() }
+          return {
+            data: {
+              bio: "I'm Rakib Adnan, a professional web developer based in Bangladesh with over 5 years of hands-on experience building websites and web applications that make a real difference for businesses.",
+              skills: [
+                { label: 'WordPress',    percent: 95, color: '#21759b' },
+                { label: 'Shopify',      percent: 92, color: '#96bf48' },
+                { label: 'React JS',     percent: 88, color: '#61dafb' },
+                { label: 'React Native', percent: 80, color: '#61dafb' },
+                { label: 'JavaScript',   percent: 90, color: '#f7df1e' },
+                { label: 'Crocoblock',   percent: 96, color: '#06b6d4' },
+                { label: 'Brick Builder',percent: 85, color: '#8b5cf6' },
+              ],
+              experience: [
+                { year: '2022 – Present', role: 'Senior Web Developer', company: 'Agency Handy', description: 'Leading development of complex WordPress and React projects, managing client relationships, and architecting scalable web solutions for businesses worldwide.' },
+                { year: '2021 – 2022',    role: 'WordPress Developer',   company: 'Freelance',     description: 'Built 100+ custom WordPress websites using Elementor, Divi, and Crocoblock. Specialized in WooCommerce and performance optimization.' },
+                { year: '2020 – 2021',    role: 'Junior Web Developer',   company: 'Local Agency',  description: 'Started professional career building websites with WordPress and learning modern JavaScript frameworks. Completed 50+ projects.' },
+              ],
+            },
+          }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['About'],
+    }),
+
+    updateAboutContent: builder.mutation({
+      async queryFn(aboutData) {
+        try {
+          await setDoc(doc(db, 'settings', 'about'), { ...aboutData, updatedAt: serverTimestamp() }, { merge: true })
+          return { data: aboutData }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['About'],
+    }),
+
     // ─── PAGES ──────────────────────────────────────────────────
     getPages: builder.query({
       async queryFn() {
@@ -468,4 +512,6 @@ export const {
   useUpdateSiteSettingsMutation,
   useGetPagesQuery,
   useUpdatePagesMutation,
+  useGetAboutContentQuery,
+  useUpdateAboutContentMutation,
 } = portfolioApi
