@@ -9,6 +9,7 @@ import {
   HiTrash,
   HiUpload,
   HiLink,
+  HiColorSwatch,
 } from 'react-icons/hi'
 import {
   useGetSiteSettingsQuery,
@@ -36,6 +37,8 @@ const ManageSettings = () => {
   const { uploadFile, uploading, progress } = useStorage()
 
   const logoInputRef = useRef(null)
+  const profileInputRef = useRef(null)
+  const bgInputRef = useRef(null)
 
   // Form state
   const [name, setName] = useState('')
@@ -43,11 +46,24 @@ const ManageSettings = () => {
   const [heroBio, setHeroBio] = useState('')
   const [cvUrl, setCvUrl] = useState('')
   const [profileImage, setProfileImage] = useState('')
-  const [profileImageMode, setProfileImageMode] = useState('url') // 'url' | 'upload'
+  const [profileImageMode, setProfileImageMode] = useState('url')
+  const [logoImage, setLogoImage] = useState('')
+  const [logoMode, setLogoMode] = useState('url')
   const [services, setServices] = useState([])
   const [socialGithub, setSocialGithub] = useState('')
   const [socialLinkedin, setSocialLinkedin] = useState('')
   const [socialWhatsapp, setSocialWhatsapp] = useState('')
+  const [pageBackgrounds, setPageBackgrounds] = useState({
+    home:     { type: 'default', color: '#030712', image: '' },
+    about:    { type: 'default', color: '#030712', image: '' },
+    projects: { type: 'default', color: '#030712', image: '' },
+    reviews:  { type: 'default', color: '#030712', image: '' },
+    blog:     { type: 'default', color: '#030712', image: '' },
+    gallery:  { type: 'default', color: '#030712', image: '' },
+    contact:  { type: 'default', color: '#030712', image: '' },
+  })
+  const [activeBgPage, setActiveBgPage] = useState('home')
+  const [bgUploadTarget, setBgUploadTarget] = useState(null)
 
   useEffect(() => {
     if (settings) {
@@ -56,10 +72,12 @@ const ManageSettings = () => {
       setHeroBio(settings.heroBio || '')
       setCvUrl(settings.cvUrl || '')
       setProfileImage(settings.profileImage || '')
+      setLogoImage(settings.logoImage || '')
       setServices(settings.services && settings.services.length > 0 ? settings.services : [])
       setSocialGithub(settings.socialLinks?.github || '')
       setSocialLinkedin(settings.socialLinks?.linkedin || '')
       setSocialWhatsapp(settings.socialLinks?.whatsapp || '')
+      if (settings.pageBackgrounds) setPageBackgrounds(settings.pageBackgrounds)
     }
   }, [settings])
 
@@ -74,6 +92,39 @@ const ManageSettings = () => {
       toast.error('Image upload failed.', toastStyle)
     }
     e.target.value = ''
+  }
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const url = await uploadFile(file)
+      setLogoImage(url)
+      toast.success('Logo uploaded!', toastStyle)
+    } catch {
+      toast.error('Logo upload failed.', toastStyle)
+    }
+    e.target.value = ''
+  }
+
+  const handleBgImageUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const url = await uploadFile(file)
+      setPageBackgrounds((prev) => ({
+        ...prev,
+        [activeBgPage]: { ...prev[activeBgPage], image: url, type: 'image' },
+      }))
+      toast.success('Background image uploaded!', toastStyle)
+    } catch {
+      toast.error('Upload failed.', toastStyle)
+    }
+    e.target.value = ''
+  }
+
+  const updateBg = (page, field, value) => {
+    setPageBackgrounds((prev) => ({ ...prev, [page]: { ...prev[page], [field]: value } }))
   }
 
   const addService = () => {
@@ -98,12 +149,14 @@ const ManageSettings = () => {
         heroBio,
         cvUrl,
         profileImage,
+        logoImage,
         services,
         socialLinks: {
           github: socialGithub,
           linkedin: socialLinkedin,
           whatsapp: socialWhatsapp,
         },
+        pageBackgrounds,
       }).unwrap()
       toast.success('Settings saved successfully!', toastStyle)
     } catch {
@@ -152,6 +205,132 @@ const ManageSettings = () => {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+
+          {/* ── Logo / Branding ──────────────────────────── */}
+          <div className="glass-card p-6">
+            <h2 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Logo / Branding</h2>
+            <p className="text-slate-500 text-xs mb-4">Upload your logo image for the navbar. If no logo is uploaded, the RA initials badge is shown.</p>
+            <div className="flex gap-2 mb-3">
+              <button type="button" onClick={() => setLogoMode('url')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${logoMode === 'url' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-dark-700/50 text-slate-400 border border-white/5 hover:border-cyan-500/20'}`}>
+                <HiLink size={12} /> URL
+              </button>
+              <button type="button" onClick={() => setLogoMode('upload')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${logoMode === 'upload' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-dark-700/50 text-slate-400 border border-white/5 hover:border-cyan-500/20'}`}>
+                <HiUpload size={12} /> Upload
+              </button>
+            </div>
+            <input type="file" accept="image/*" ref={logoInputRef} onChange={handleLogoUpload} className="hidden" />
+            {logoMode === 'url' ? (
+              <input type="url" value={logoImage} onChange={(e) => setLogoImage(e.target.value)}
+                placeholder="https://example.com/logo.png" className="form-input" />
+            ) : (
+              <button type="button" onClick={() => logoInputRef.current?.click()} disabled={uploading}
+                className="w-full form-input text-left text-slate-500 hover:border-cyan-500/30 flex items-center gap-2 disabled:opacity-60">
+                <HiPhotograph size={16} />
+                {uploading ? `Uploading... ${progress}%` : 'Choose logo image...'}
+              </button>
+            )}
+            {logoImage && (
+              <div className="mt-3 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl overflow-hidden border border-cyan-500/20 bg-dark-700 flex-shrink-0">
+                  <img src={logoImage} alt="Logo" className="w-full h-full object-contain p-1" onError={(e) => { e.target.style.display='none' }} />
+                </div>
+                <div>
+                  <p className="text-slate-300 text-xs font-medium">Logo set ✓</p>
+                  <button type="button" onClick={() => setLogoImage('')} className="text-red-400 text-xs hover:text-red-300 mt-0.5">Remove</button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Page Backgrounds ─────────────────────────── */}
+          <div className="glass-card p-6">
+            <h2 className="text-white font-semibold mb-1 text-sm uppercase tracking-widest flex items-center gap-2">
+              <HiColorSwatch size={15} className="text-cyan-400" />
+              Page Backgrounds
+            </h2>
+            <p className="text-slate-500 text-xs mb-4">Set a custom background color or image for each page.</p>
+
+            {/* Page tabs */}
+            <div className="flex flex-wrap gap-2 mb-5">
+              {Object.keys(pageBackgrounds).map((pg) => (
+                <button key={pg} type="button" onClick={() => setActiveBgPage(pg)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all ${
+                    activeBgPage === pg
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                      : 'bg-dark-700/50 text-slate-400 border border-white/5 hover:border-cyan-500/20'
+                  }`}
+                >
+                  {pg}
+                </button>
+              ))}
+            </div>
+
+            {/* Background type selector */}
+            <div className="flex gap-2 mb-4">
+              {['default', 'color', 'image'].map((t) => (
+                <button key={t} type="button"
+                  onClick={() => updateBg(activeBgPage, 'type', t)}
+                  className={`px-3 py-1.5 rounded-lg text-xs capitalize transition-all ${
+                    pageBackgrounds[activeBgPage]?.type === t
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                      : 'bg-dark-700/50 text-slate-400 border border-white/5'
+                  }`}
+                >
+                  {t === 'default' ? 'Default Dark' : t === 'color' ? 'Custom Color' : 'Image'}
+                </button>
+              ))}
+            </div>
+
+            {pageBackgrounds[activeBgPage]?.type === 'color' && (
+              <div className="flex items-center gap-3">
+                <input type="color"
+                  value={pageBackgrounds[activeBgPage]?.color || '#030712'}
+                  onChange={(e) => updateBg(activeBgPage, 'color', e.target.value)}
+                  className="w-12 h-10 rounded cursor-pointer bg-transparent border-0"
+                />
+                <input type="text"
+                  value={pageBackgrounds[activeBgPage]?.color || '#030712'}
+                  onChange={(e) => updateBg(activeBgPage, 'color', e.target.value)}
+                  placeholder="#030712"
+                  className="form-input font-mono flex-1"
+                />
+              </div>
+            )}
+
+            {pageBackgrounds[activeBgPage]?.type === 'image' && (
+              <div className="space-y-3">
+                <input type="file" accept="image/*" ref={bgInputRef} onChange={handleBgImageUpload} className="hidden" />
+                <button type="button" onClick={() => bgInputRef.current?.click()} disabled={uploading}
+                  className="w-full form-input text-left text-slate-500 hover:border-cyan-500/30 flex items-center gap-2 disabled:opacity-60">
+                  <HiPhotograph size={16} />
+                  {uploading ? `Uploading... ${progress}%` : 'Upload background image...'}
+                </button>
+                <p className="text-slate-600 text-xs">— or paste a URL —</p>
+                <input type="url"
+                  value={pageBackgrounds[activeBgPage]?.image || ''}
+                  onChange={(e) => updateBg(activeBgPage, 'image', e.target.value)}
+                  placeholder="https://example.com/bg.jpg"
+                  className="form-input text-sm"
+                />
+                {pageBackgrounds[activeBgPage]?.image && (
+                  <div className="relative h-24 rounded-xl overflow-hidden border border-white/10">
+                    <img src={pageBackgrounds[activeBgPage].image} alt="bg preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <span className="text-white text-xs font-medium capitalize">{activeBgPage} background</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {pageBackgrounds[activeBgPage]?.type === 'default' && (
+              <p className="text-slate-600 text-xs py-2">
+                Using the default dark background (#030712). Switch to "Custom Color" or "Image" to change it.
+              </p>
+            )}
+          </div>
 
           {/* ── Identity ─────────────────────────────────── */}
           <div className="glass-card p-6">

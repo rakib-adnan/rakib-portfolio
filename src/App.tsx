@@ -26,6 +26,7 @@ const ManageHero     = lazy(() => import('./pages/Dashboard/components/ManageHer
 const ManageBlog     = lazy(() => import('./pages/Dashboard/components/ManageBlog'))
 const ManageGallery  = lazy(() => import('./pages/Dashboard/components/ManageGallery'))
 const ManageSettings = lazy(() => import('./pages/Dashboard/components/ManageSettings'))
+const ManagePages    = lazy(() => import('./pages/Dashboard/components/ManagePages'))
 
 // Suspense fallback
 const SuspenseFallback = () => (
@@ -110,6 +111,7 @@ const AppRoutes = () => {
             <Route path="hero"      element={<ManageHero />} />
             <Route path="blog"      element={<ManageBlog />} />
             <Route path="gallery"   element={<ManageGallery />} />
+            <Route path="pages"     element={<ManagePages />} />
             <Route path="settings"  element={<ManageSettings />} />
           </Route>
         </Routes>

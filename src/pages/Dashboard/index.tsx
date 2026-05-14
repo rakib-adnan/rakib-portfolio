@@ -15,19 +15,21 @@ import {
   HiChevronRight,
   HiDocumentText,
   HiCog,
+  HiTemplate,
 } from 'react-icons/hi'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
 
 const sidebarLinks = [
-  { to: '/dashboard', label: 'Overview', icon: HiViewGrid, end: true },
-  { to: '/dashboard/projects', label: 'Projects', icon: HiCollection },
-  { to: '/dashboard/reviews', label: 'Reviews', icon: HiStar },
-  { to: '/dashboard/messages', label: 'Messages', icon: HiMail },
-  { to: '/dashboard/hero', label: 'Hero Content', icon: HiPhotograph },
-  { to: '/dashboard/blog', label: 'Blog Posts', icon: HiDocumentText },
-  { to: '/dashboard/gallery', label: 'Gallery', icon: HiPhotograph },
-  { to: '/dashboard/settings', label: 'Settings', icon: HiCog },
+  { to: '/dashboard',          label: 'Overview',    icon: HiViewGrid,    end: true, group: null },
+  { to: '/dashboard/projects', label: 'Projects',    icon: HiCollection,  group: 'Content' },
+  { to: '/dashboard/reviews',  label: 'Reviews',     icon: HiStar,        group: 'Content' },
+  { to: '/dashboard/blog',     label: 'Blog Posts',  icon: HiDocumentText,group: 'Content' },
+  { to: '/dashboard/gallery',  label: 'Gallery',     icon: HiPhotograph,  group: 'Content' },
+  { to: '/dashboard/messages', label: 'Messages',    icon: HiMail,        group: 'Inbox' },
+  { to: '/dashboard/hero',     label: 'Hero Content',icon: HiPhotograph,  group: 'Appearance' },
+  { to: '/dashboard/pages',    label: 'Pages',       icon: HiTemplate,    group: 'Appearance' },
+  { to: '/dashboard/settings', label: 'Settings',    icon: HiCog,         group: 'Appearance' },
 ]
 
 // Protected Route wrapper
@@ -36,7 +38,7 @@ export const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#030712' }}>
         <div className="text-center">
           <div className="w-12 h-12 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-400 text-sm">Loading...</p>
@@ -70,7 +72,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex">
+    <div className="min-h-screen flex" style={{ backgroundColor: '#030712' }}>
       {/* Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-dark-800/95 backdrop-blur-md border-r border-cyan-500/10
@@ -97,23 +99,44 @@ const Dashboard = () => {
 
           {/* Nav links */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
-            <div className="space-y-1">
-              {sidebarLinks.map(({ to, label, icon: Icon, end }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    `sidebar-link group ${isActive ? 'active' : ''}`
-                  }
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon size={18} />
-                  <span className="text-sm font-medium flex-1">{label}</span>
-                  <HiChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                </NavLink>
-              ))}
-            </div>
+            {/* Overview (ungrouped) */}
+            {sidebarLinks.filter(l => !l.group).map(({ to, label, icon: Icon, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) => `sidebar-link group ${isActive ? 'active' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <Icon size={18} />
+                <span className="text-sm font-medium flex-1">{label}</span>
+                <HiChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              </NavLink>
+            ))}
+
+            {/* Grouped sections */}
+            {['Content', 'Inbox', 'Appearance'].map((group) => {
+              const links = sidebarLinks.filter(l => l.group === group)
+              if (!links.length) return null
+              return (
+                <div key={group} className="mt-4">
+                  <p className="text-slate-600 text-[10px] uppercase tracking-widest px-4 mb-1">{group}</p>
+                  {links.map(({ to, label, icon: Icon, end }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      end={end}
+                      className={({ isActive }) => `sidebar-link group ${isActive ? 'active' : ''}`}
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <Icon size={18} />
+                      <span className="text-sm font-medium flex-1">{label}</span>
+                      <HiChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </NavLink>
+                  ))}
+                </div>
+              )
+            })}
           </nav>
 
           {/* User info + logout */}

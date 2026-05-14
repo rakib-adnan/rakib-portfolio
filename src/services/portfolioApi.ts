@@ -1,4 +1,14 @@
 // @ts-nocheck
+export const DEFAULT_PAGES = [
+  { id: 'home',     name: 'Home',     slug: '/',         showInHeader: true,  showInFooter: false, isBuiltIn: true,  order: 0 },
+  { id: 'about',    name: 'About',    slug: '/about',    showInHeader: false, showInFooter: true,  isBuiltIn: true,  order: 1 },
+  { id: 'projects', name: 'Projects', slug: '/projects', showInHeader: true,  showInFooter: true,  isBuiltIn: true,  order: 2 },
+  { id: 'reviews',  name: 'Reviews',  slug: '/reviews',  showInHeader: false, showInFooter: true,  isBuiltIn: true,  order: 3 },
+  { id: 'blog',     name: 'Blog',     slug: '/blog',     showInHeader: false, showInFooter: true,  isBuiltIn: true,  order: 4 },
+  { id: 'gallery',  name: 'Gallery',  slug: '/gallery',  showInHeader: false, showInFooter: true,  isBuiltIn: true,  order: 5 },
+  { id: 'contact',  name: 'Contact',  slug: '/contact',  showInHeader: true,  showInFooter: true,  isBuiltIn: true,  order: 6 },
+]
+
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import {
   collection,
@@ -19,7 +29,7 @@ import { db } from '../firebase/config'
 export const portfolioApi = createApi({
   reducerPath: 'portfolioApi',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero', 'Blogs', 'Gallery', 'Settings'],
+  tagTypes: ['Projects', 'Reviews', 'Messages', 'Hero', 'Blogs', 'Gallery', 'Settings', 'Pages'],
   endpoints: (builder) => ({
     // ─── PROJECTS ───────────────────────────────────────────────
     getProjects: builder.query({
@@ -396,6 +406,38 @@ export const portfolioApi = createApi({
       },
       invalidatesTags: ['Settings'],
     }),
+
+    // ─── PAGES ──────────────────────────────────────────────────
+    getPages: builder.query({
+      async queryFn() {
+        try {
+          const docRef = doc(db, 'settings', 'pages')
+          const snapshot = await getDoc(docRef)
+          if (snapshot.exists()) {
+            return { data: snapshot.data().pages || DEFAULT_PAGES }
+          }
+          return { data: DEFAULT_PAGES }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      providesTags: ['Pages'],
+    }),
+
+    updatePages: builder.mutation({
+      async queryFn(pages) {
+        try {
+          await setDoc(doc(db, 'settings', 'pages'), {
+            pages,
+            updatedAt: serverTimestamp(),
+          })
+          return { data: pages }
+        } catch (e) {
+          return { error: { message: e.message } }
+        }
+      },
+      invalidatesTags: ['Pages'],
+    }),
   }),
 })
 
@@ -424,4 +466,6 @@ export const {
   useDeleteGalleryItemMutation,
   useGetSiteSettingsQuery,
   useUpdateSiteSettingsMutation,
+  useGetPagesQuery,
+  useUpdatePagesMutation,
 } = portfolioApi

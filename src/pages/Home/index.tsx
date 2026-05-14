@@ -250,34 +250,20 @@ const socialLinks = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-const SkillBar = ({ label, percent, icon: Icon, color, delay }) => {
-  const [ref, inView] = useInView({ threshold: 0, triggerOnce: true })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: -30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="mb-5"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <Icon size={16} style={{ color }} />
-          <span className="text-slate-300 text-sm font-medium">{label}</span>
-        </div>
-        <span className="text-cyan-400 text-sm font-bold">{percent}%</span>
+const SkillBar = ({ label, percent, icon: Icon, color }) => (
+  <div className="mb-5">
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center gap-2">
+        <Icon size={16} style={{ color }} />
+        <span className="text-slate-300 text-sm font-medium">{label}</span>
       </div>
-      <div className="skill-bar">
-        <motion.div
-          className="skill-bar-fill"
-          initial={{ width: 0 }}
-          animate={inView ? { width: `${percent}%` } : { width: 0 }}
-          transition={{ duration: 1.2, delay: delay + 0.2, ease: 'easeOut' }}
-        />
-      </div>
-    </motion.div>
-  )
-}
+      <span className="text-cyan-400 text-sm font-bold">{percent}%</span>
+    </div>
+    <div className="skill-bar">
+      <div className="skill-bar-fill animate-progress" style={{ width: `${percent}%` }} />
+    </div>
+  </div>
+)
 
 const StarRating = ({ rating, size = 14 }) => (
   <div className="flex gap-0.5">
@@ -776,8 +762,8 @@ const Home = () => {
           <div className="mb-20">
             <SectionTitle subtitle="Skills" title="My Technical Skills" description="Technologies and tools I use to bring projects to life" />
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-2">
-              {aboutSkills.map((skill, i) => (
-                <SkillBar key={skill.label} {...skill} delay={i * 0.08} />
+              {aboutSkills.map((skill) => (
+                <SkillBar key={skill.label} {...skill} />
               ))}
             </div>
           </div>
