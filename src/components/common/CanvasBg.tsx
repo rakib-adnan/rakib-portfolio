@@ -1,19 +1,8 @@
 import { useEffect, useRef } from 'react'
 
-interface Dot {
-  baseX: number
-  baseY: number
-  x: number
-  y: number
-  phase: number
-  phaseY: number
-  color: string
-  size: number
-  opacity: number
-}
-
-// VANTA.DOTS-style — wave-animated dot grid with connecting paths
-// Primary: cyan #06b6d4 · Secondary: purple #8b5cf6
+// Wave dot grid — replicates RyanCV Digital theme WebGL animation
+// GLSL wave: pos.y += (cos(x/w * PI*8 + t*speed) + sin(z/d * PI*8 + t*speed)) * amp
+// Color: brand cyan (#06b6d4) left → purple (#8b5cf6) right, alpha fades near→far
 const CanvasBg = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -21,131 +10,92 @@ const CanvasBg = () => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
-    let animId: number
-    const mouse = { x: -9999, y: -9999 }
+    let raf = 0
+    const t0 = performance.now()
+    const PI = Math.PI
 
-    const onMouseMove = (e: MouseEvent) => {
-      mouse.x = e.clientX
-      mouse.y = e.clientY
-    }
+    const COLS = 58
+    const ROWS = 34
+    const HORIZON = 0.40   // horizon position as fraction of screen height
+    const WAVE_AMP = 24    // max wave amplitude (pixels, at near)
+    const WAVE_SPEED = 5.0 // matches original uniforms.speed = 5
 
-    let dots: Dot[] = []
-
-    const buildDots = () => {
-      dots = []
-      const SPACING = 85
-      const cols = Math.ceil(canvas.width / SPACING) + 2
-      const rows = Math.ceil(canvas.height / SPACING) + 2
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          dots.push({
-            baseX: i * SPACING + (Math.random() - 0.5) * 20,
-            baseY: j * SPACING + (Math.random() - 0.5) * 20,
-            x: 0,
-            y: 0,
-            phase: Math.random() * Math.PI * 2,
-            phaseY: Math.random() * Math.PI * 2,
-            color: Math.random() > 0.45 ? '#06b6d4' : '#8b5cf6',
-            size: Math.random() * 2.4 + 0.8,
-            opacity: Math.random() * 0.55 + 0.25,
-          })
-        }
-      }
-    }
-
-    const resize = () => {
+    const onResize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
-      buildDots()
     }
+    onResize()
+    window.addEventListener('resize', onResize)
 
-    resize()
-    window.addEventListener('resize', resize)
-    window.addEventListener('mousemove', onMouseMove)
+    const render = () => {
+      const t = (performance.now() - t0) * 0.001 * WAVE_SPEED
 
-    const CONNECT = 92
-    const WAVE = 15
-    let tick = 0
+      const W = canvas.width
+      const H = canvas.height
+      ctx.clearRect(0, 0, W, H)
 
-    const draw = () => {
-      ctx.fillStyle = '#030712'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      const cx = W * 0.5
+      const horizonY = H * HORIZON
+      const groundH = H - horizonY
 
-      tick += 0.005
+      // Draw far→near so near rows render on top
+      for (let zi = 0; zi < ROWS; zi++) {
+        // zr: 0=far(top), 1=near(bottom)
+        const zr = zi / (ROWS - 1)
 
-      for (const d of dots) {
-        d.x = d.baseX + Math.sin(tick + d.phase) * WAVE
-        d.y = d.baseY + Math.cos(tick * 0.8 + d.phaseY) * WAVE
-        // Mouse repulsion
-        const mdx = d.x - mouse.x
-        const mdy = d.y - mouse.y
-        const md = Math.sqrt(mdx * mdx + mdy * mdy)
-        if (md < 110 && md > 0) {
-          const f = ((110 - md) / 110) * 20
-          d.x += (mdx / md) * f
-          d.y += (mdy / md) * f
-        }
-      }
+        // Exponential depth: far rows tightly packed, near rows spread out
+        const rowY = horizonY + Math.pow(zr, 1.8) * groundH * 0.88
 
-      // Connecting paths
-      ctx.lineWidth = 0.5
-      for (let i = 0; i < dots.length; i++) {
-        for (let j = i + 1; j < dots.length; j++) {
-          const dx = dots[i].x - dots[j].x
-          const dy = dots[i].y - dots[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist > CONNECT) continue
-          const a = (1 - dist / CONNECT) * 0.2
+        // Perspective scale: near=wide, far=narrow
+        const ps = 0.03 + Math.pow(zr, 1.3) * 0.97
+
+        // Dot size and opacity increase toward camera
+        const dotR = 0.5 + zr * 2.4
+        const alpha = 0.05 + zr * 0.72
+
+        for (let xi = 0; xi < COLS; xi++) {
+          const xr = xi / (COLS - 1)   // 0=left, 1=right
+
+          // Screen x: centered, spread by perspective scale
+          const sx = cx + (xr - 0.5) * W * ps
+
+          // Wave: exact GLSL formula translation
+          // original: (cos(pos.x/field.x * PI*8 + t) + sin(pos.z/field.z * PI*8 + t)) * field.y
+          const waveY = (
+            Math.cos(xr * PI * 8 + t) +
+            Math.sin(zr * PI * 8 + t)
+          ) * WAVE_AMP * ps
+
+          const sy = rowY - waveY
+
+          // Color: matches original GL color buffer formula
+          // original: (R=0, G=1-x/w, B=0.5+x/w*0.5, A=z/depth)
+          // mapped to brand: cyan (#06b6d4) → purple (#8b5cf6)
+          const r = Math.round(6 + xr * 133)   // 6 → 139
+          const g = Math.round(182 - xr * 90)  // 182 → 92
+          const b = Math.round(212 + xr * 34)  // 212 → 246
+
+          // Soft glow halo (large faint circle)
           ctx.beginPath()
-          ctx.moveTo(dots[i].x, dots[i].y)
-          ctx.lineTo(dots[j].x, dots[j].y)
-          ctx.strokeStyle = `rgba(6,182,212,${a})`
-          ctx.stroke()
-        }
-      }
+          ctx.arc(sx, sy, dotR * 3.8, 0, PI * 2)
+          ctx.fillStyle = `rgba(${r},${g},${b},${(alpha * 0.13).toFixed(3)})`
+          ctx.fill()
 
-      // Mouse → dot violet paths
-      ctx.lineWidth = 0.8
-      for (const d of dots) {
-        const dx = d.x - mouse.x
-        const dy = d.y - mouse.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 130) {
-          const a = (1 - dist / 130) * 0.4
+          // Core dot
           ctx.beginPath()
-          ctx.moveTo(mouse.x, mouse.y)
-          ctx.lineTo(d.x, d.y)
-          ctx.strokeStyle = `rgba(139,92,246,${a})`
-          ctx.stroke()
-        }
-      }
-
-      // Dots
-      for (const d of dots) {
-        if (d.size > 1.8) {
-          ctx.beginPath()
-          ctx.arc(d.x, d.y, d.size * 2.8, 0, Math.PI * 2)
-          ctx.fillStyle = d.color
-          ctx.globalAlpha = d.opacity * 0.1
+          ctx.arc(sx, sy, dotR, 0, PI * 2)
+          ctx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`
           ctx.fill()
         }
-        ctx.beginPath()
-        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2)
-        ctx.fillStyle = d.color
-        ctx.globalAlpha = d.opacity
-        ctx.fill()
       }
 
-      ctx.globalAlpha = 1
-      animId = requestAnimationFrame(draw)
+      raf = requestAnimationFrame(render)
     }
 
-    draw()
-
+    render()
     return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
-      window.removeEventListener('mousemove', onMouseMove)
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', onResize)
     }
   }, [])
 
