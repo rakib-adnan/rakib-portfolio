@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Disallow admin dashboard
+Disallow: /dashboard/
+
+Sitemap: https://YOUR_USERNAME.github.io/rakib-portfolio/sitemap.xml
